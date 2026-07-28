@@ -9,9 +9,10 @@ as MCP tools following the Model Context Protocol specification.
 import asyncio
 import logging
 import sys
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from mcp.server.fastmcp import FastMCP
+from mcp.server.transport_security import TransportSecuritySettings
 
 from .config import Config
 from .service import SirchmunkService
@@ -40,25 +41,33 @@ def create_server(config: Config) -> FastMCP:
     # Create FastMCP server
     mcp = FastMCP(
         name=config.mcp.server_name,
+        transport_security=TransportSecuritySettings(enable_dns_rebinding_protection=False),
     )
     
     logger.info(
         f"Creating MCP server: {config.mcp.server_name}"
     )
     
+    def _normalize_str_list(v: Union[str, List[str], None]) -> Optional[List[str]]:
+        if v is None:
+            return None
+        if isinstance(v, str):
+            return [v]
+        return v
+
     # Register tools using decorators
     @mcp.tool()
     async def sirchmunk_search(
         query: str,
-        paths: Optional[List[str]] = None,
+        paths: Union[str, List[str], None] = None,
         mode: str = "FAST",
         max_depth: int = 5,
         top_k_files: int = 3,
         max_loops: int = 10,
         max_token_budget: int = 128000,
         enable_dir_scan: bool = True,
-        include: Optional[List[str]] = None,
-        exclude: Optional[List[str]] = None,
+        include: Union[str, List[str], None] = None,
+        exclude: Union[str, List[str], None] = None,
         return_context: bool = False,
     ) -> str:
         """Search local files, documents, and raw data on disk. Supports 100+ file formats
@@ -102,6 +111,10 @@ def create_server(config: Config) -> FastMCP:
         """
         if _service is None:
             return "Error: Service not initialized"
+
+        paths = _normalize_str_list(paths)
+        include = _normalize_str_list(include)
+        exclude = _normalize_str_list(exclude)
 
         logger.info(f"sirchmunk_search: mode={mode}, query='{query[:50]}...'")
 
