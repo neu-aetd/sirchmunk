@@ -333,7 +333,7 @@ def parse_args() -> argparse.Namespace:
                     help="Comma-separated registries to push to (overrides defaults)")
     p.add_argument("--dry_run", type=int, default=0,
                     help="1 = generate Dockerfile only, skip docker build")
-    p.add_argument("--platform", default=None,
+    p.add_argument("--platform", default="linux/amd64",
                     help="Target platform(s). Single (e.g. linux/amd64) for local build, "
                          "or comma-separated (e.g. linux/amd64,linux/arm64) for multi-arch "
                          "buildx (requires --push)")
