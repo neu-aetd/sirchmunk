@@ -90,9 +90,9 @@ class Builder:
 
     DEFAULTS = {
         "python_version": "3.12",
-        "node_version": "20",
+        "node_version": "23",
         "ubuntu_version": "22.04",
-        "rg_version": "14.1.1",
+        "rg_version": "15.2.0",
         "rga_version": "v0.10.10",
         "port": "8584",
     }
