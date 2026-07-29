@@ -53,6 +53,13 @@ jobs:
         with:
           ref: ${{ github.event.inputs.sirchmunk_branch }}
 
+      - name: Get version
+        id: get_version
+        run: |
+          VERSION=$(grep '__version__' src/sirchmunk/version.py | \
+            sed "s/__version__ = ['\"]\([^'\"]*\)['\"]/\1/")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Generate Dockerfile from template
         run: |
           MIRROR_ARG=""
@@ -97,3 +104,4 @@ jobs:
           provenance: false
           tags: |
             ghcr.io/${{ github.repository_owner }}/sirchmunk:latest
+            ghcr.io/${{ github.repository_owner }}/sirchmunk:${{ steps.get_version.outputs.version }}
