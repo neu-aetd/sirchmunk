@@ -5,7 +5,7 @@ Sirchmunk MCP Server
 A Model Context Protocol (MCP) server that exposes Sirchmunk's intelligent
 code and document search capabilities as MCP tools.
 
-Uses FastMCP for simplified MCP server implementation.
+Uses MCPServer for simplified MCP server implementation.
 """
 
 from sirchmunk.version import __version__

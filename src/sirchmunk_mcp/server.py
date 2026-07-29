@@ -1,6 +1,6 @@
 # Copyright (c) ModelScope Contributors. All rights reserved.
 """
-MCP Server implementation for Sirchmunk using FastMCP.
+MCP Server implementation for Sirchmunk using MCPServer.
 
 Provides the main MCP server that exposes Sirchmunk functionality
 as MCP tools following the Model Context Protocol specification.
@@ -11,7 +11,7 @@ import logging
 import sys
 from typing import Any, Dict, List, Optional, Union
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 from mcp.server.transport_security import TransportSecuritySettings
 
 from .config import Config
@@ -24,25 +24,22 @@ logger = logging.getLogger(__name__)
 _service: Optional[SirchmunkService] = None
 
 
-def create_server(config: Config) -> FastMCP:
-    """Create and configure FastMCP server instance.
+def create_server(config: Config) -> MCPServer:
+    """Create and configure MCPServer instance.
     
     Args:
         config: Configuration object
     
     Returns:
-        Configured FastMCP server instance
+        Configured MCPServer instance
     """
     global _service
     
     # Initialize service
     _service = SirchmunkService(config)
     
-    # Create FastMCP server
-    mcp = FastMCP(
-        name=config.mcp.server_name,
-        transport_security=TransportSecuritySettings(enable_dns_rebinding_protection=False),
-    )
+    # Create MCPServer
+    mcp = MCPServer(name=config.mcp.server_name)
     
     logger.info(
         f"Creating MCP server: {config.mcp.server_name}"
@@ -445,7 +442,7 @@ async def run_http_server(config: Config) -> None:
     try:
         import uvicorn
         uv_config = uvicorn.Config(
-            mcp.sse_app(),
+            mcp.sse_app(transport_security=TransportSecuritySettings(enable_dns_rebinding_protection=False)),
             host=config.mcp.host,
             port=config.mcp.port,
             log_level="info",

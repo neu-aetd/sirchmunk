@@ -403,7 +403,7 @@ sirchmunk mcp version
 ┌─────────────────────────────────┐
 │    Sirchmunk MCP Server         │
 │  ┌──────────────────────────┐   │
-│  │  FastMCP Layer           │   │
+│  │  MCPServer Layer         │   │
 │  │  - @mcp.tool() decorators│   │
 │  │  - Auto tool discovery   │   │
 │  └──────────┬───────────────┘   │
