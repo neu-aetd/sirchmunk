@@ -1096,7 +1096,7 @@ class AgenticSearch(BaseSearch):
         should_save = should_save_str in ["true", "yes", "1"]
 
         if precise and summary:
-            summary = f"**Answer: {precise}**\n\n{summary}"
+            summary = f"**{precise}**\n\n{summary}"
         elif precise:
             summary = precise
 
