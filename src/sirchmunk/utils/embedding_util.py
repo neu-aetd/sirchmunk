@@ -95,7 +95,7 @@ class EmbeddingUtil:
             self._model_future.set_result(model)
             logger.info(
                 f"Embedding model ready: {model_id} "
-                f"(device={self.device}, dim={model.get_sentence_embedding_dimension()})"
+                f"(device={self.device}, dim={model.get_embedding_dimension()})"
             )
         except Exception as e:
             self._model_future.set_exception(e)
@@ -202,14 +202,14 @@ class EmbeddingUtil:
     @property
     def dimension(self) -> int:
         """Return embedding dimension (384 for MiniLM-L12-v2)."""
-        return self._ensure_model().get_sentence_embedding_dimension()
+        return self._ensure_model().get_embedding_dimension()
 
     def get_model_info(self) -> Dict[str, Any]:
         """Return model metadata.  Blocks until the model is ready."""
         model = self._ensure_model()
         return {
             "model_id": self.model_id,
-            "dimension": model.get_sentence_embedding_dimension(),
+            "dimension": model.get_embedding_dimension(),
             "device": self.device,
             "max_seq_length": model.max_seq_length,
         }
