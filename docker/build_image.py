@@ -53,10 +53,11 @@ DEFAULT_ACR_REGISTRIES = [
 MIRROR_PROFILES: Dict[str, Dict[str, str]] = {
     "cn": {
         "docker_prefix": "docker.m.daocloud.io/library/",
+        "apt_mirror": "http://mirrors.aliyun.com",
         "pip_index_url": "https://mirrors.aliyun.com/pypi/simple/",
         "pip_trusted_host": "mirrors.aliyun.com",
         "npm_registry": "https://registry.npmmirror.com",
-        "github_proxy": "https://ghfast.top/",
+        "github_proxy": "https://gh-proxy.com/",
     },
 }
 
@@ -90,7 +91,7 @@ class Builder:
 
     DEFAULTS = {
         "python_version": "3.12",
-        "node_version": "23",
+        "node_version": "24",
         "ubuntu_version": "22.04",
         "rg_version": "15.2.0",
         "rga_version": "v0.10.10",
@@ -137,14 +138,27 @@ class Builder:
             )
             npm_cmd = f"RUN npm config set registry {self.mirror['npm_registry']}\n"
             github_proxy = self.mirror["github_proxy"]
+            apt_mirror = self.mirror.get("apt_mirror", "")
+            if apt_mirror:
+                host = apt_mirror.removeprefix("http://").removeprefix("https://")
+                apt_mirror_cmd = (
+                    f"RUN sed -i 's|deb.debian.org|{host}|g' /etc/apt/sources.list 2>/dev/null; \\\n"
+                    f"    sed -i 's|security.debian.org|{host}|g' /etc/apt/sources.list 2>/dev/null; \\\n"
+                    f"    sed -i 's|deb.debian.org|{host}|g' /etc/apt/sources.list.d/*.sources 2>/dev/null; \\\n"
+                    f"    sed -i 's|security.debian.org|{host}|g' /etc/apt/sources.list.d/*.sources 2>/dev/null || true\n"
+                )
+            else:
+                apt_mirror_cmd = ""
         else:
             pip_args = ""
             npm_cmd = ""
             github_proxy = ""
+            apt_mirror_cmd = ""
         return {
             "pip_index_args": pip_args,
             "npm_mirror_cmd": npm_cmd,
             "github_proxy": github_proxy,
+            "apt_mirror_cmd": apt_mirror_cmd,
         }
 
     def _replacements(self) -> dict:

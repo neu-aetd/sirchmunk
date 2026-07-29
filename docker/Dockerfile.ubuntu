@@ -28,7 +28,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
 
 # System dependencies + rga adapters (see https://github.com/phiresky/ripgrep-all) + debug tools
-RUN apt-get update && apt-get install -y --no-install-recommends \
+{apt_mirror_cmd}RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
         curl \
         git \
@@ -74,6 +74,12 @@ WORKDIR /app
 
 # Install Python dependencies (core + web + mcp — no docs/tests in production)
 COPY requirements/ requirements/
+
+# Pre-install torch (CPU-only) — sentence-transformers depends on torch,
+# and the default PyPI index resolves to the CUDA variant (~2GB unnecessary).
+# Must come before requirements to prevent CUDA torch from being pulled in.
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+
 RUN pip install --no-cache-dir {pip_index_args}\
     -r requirements/core.txt \
     -r requirements/web.txt \
